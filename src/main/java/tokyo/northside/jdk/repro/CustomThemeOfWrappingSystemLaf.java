@@ -3,34 +3,46 @@ package tokyo.northside.jdk.repro;
 import javax.swing.*;
 import java.awt.*;
 
-public class MyLookAndFeel extends LookAndFeel {
+/**
+ * Custom Look And Feel that wraps system LookAndFeel.
+ * Just return values of system laf's getDefaults for getDefaults method.
+ */
+public class CustomThemeOfWrappingSystemLaf extends LookAndFeel {
+
+    private static final String NAME = CustomThemeOfWrappingSystemLaf.class.getSimpleName();
+    private static final String CLASSNAME = CustomThemeOfWrappingSystemLaf.class.getName();
 
     private final LookAndFeel systemLookAndFeel;
-    private static final String NAME = "MyLookAndFeel";
 
-    public MyLookAndFeel() throws UnsupportedLookAndFeelException {
-        String systemLafClass = UIManager.getSystemLookAndFeelClassName();
-        String systemLafName = null;
-        for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-            if (info.getClassName().equals(systemLafClass)) {
-                systemLafName = info.getName();
-            }
-        }
-        if (systemLafName == null) {
-            // Should never happen: system LAF is guaranteed to be installed
-            throw new RuntimeException("Could not identify system LAF name");
-        }
-        systemLookAndFeel = UIManager.createLookAndFeel(systemLafName);
+    /**
+     * Utility to install and set LookAndFeel.
+     * @throws Exception when got error.
+     */
+    public static void installAndSet() throws Exception {
+        UIManager.installLookAndFeel(NAME, CLASSNAME);
+        Class<?> clazz = ClassLoader.getSystemClassLoader().loadClass(CLASSNAME);
+        UIManager.setLookAndFeel((LookAndFeel) clazz.getDeclaredConstructor().newInstance());
     }
 
-    public UIDefaults setDefaults(UIDefaults defaults) {
-        defaults.put("TextPane.background", defaults.getColor("List.background"));
-        return defaults;
+    /**
+     * Constructor of custom laf.
+     * @throws UnsupportedLookAndFeelException when failed to create laf.
+     */
+    public CustomThemeOfWrappingSystemLaf() throws UnsupportedLookAndFeelException {
+        String systemLafClass = UIManager.getSystemLookAndFeelClassName();
+        for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+            if (info.getClassName().equals(systemLafClass)) {
+                systemLookAndFeel = UIManager.createLookAndFeel(info.getName());
+                return;
+            }
+        }
+        // Should never happen: system LAF is guaranteed to be installed
+        throw new RuntimeException("Could not identify system LAF name");
     }
 
     @Override
     public UIDefaults getDefaults() {
-        return setDefaults(systemLookAndFeel.getDefaults());
+        return systemLookAndFeel.getDefaults();
     }
 
     @Override
@@ -77,6 +89,4 @@ public class MyLookAndFeel extends LookAndFeel {
     public void uninitialize() {
         systemLookAndFeel.uninitialize();
     }
-
-
 }

@@ -4,17 +4,22 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
-public class CustomLafMenuFocusBug {
+/**
+ * When installs Custom LaF which wraps system LaF, the test failed as wrong focus owner.
+ * <p>
+ *     This is triggered by installing custom LaF that wrap system laf.
+ *     CustomThemeOfWrappingSystemLaf class is the example.
+ *     When failed, the focus is on TextField, not on RootPane.
+ *     The issue is observed on Linux, and Windows.
+ * </p>
+ */
+public class TestCustomLafMenuFocus {
 
     private volatile static JFrame f;
     private volatile static boolean uiCreated;
 
     public static void main(String[] args) throws Exception {
-        String myLafClass = MyLookAndFeel.class.getName();
-        UIManager.installLookAndFeel("My Custom Look and Feel", myLafClass);
-        ClassLoader cl = ClassLoader.getSystemClassLoader();
-        Class<?> clazz = cl.loadClass(myLafClass);
-        UIManager.setLookAndFeel((LookAndFeel) clazz.getDeclaredConstructor().newInstance());
+        CustomThemeOfWrappingSystemLaf.installAndSet();
         try {
             SwingUtilities.invokeAndWait(() -> {
                 try {
@@ -86,5 +91,4 @@ public class CustomLafMenuFocusBug {
 
         return menuBar;
     }
-
 }
