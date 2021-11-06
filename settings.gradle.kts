@@ -1,1 +1,1 @@
-rootProject.name = "gradle-project-skeleton"
+rootProject.name = "java-repro-custom-laf-menu-focus"
