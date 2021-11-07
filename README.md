@@ -15,6 +15,11 @@ all the tests are passed as expected.
 - OS: Linux, macOS and Windows
 - OpenJDK: 8, 11, 17
 
+## Work around
+
+When custom LaF is inherited from abstract `BasicLookAndFeel` instead of `LookAndFeel` class,
+the problem is gone. Please see PR #1 .
+
 ## Project affected
 
 - OmegaT [BUGS#1073](https://sourceforge.net/p/omegat/bugs/1073/)
