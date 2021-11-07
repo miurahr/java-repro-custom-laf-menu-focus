@@ -21,6 +21,7 @@
 package tokyo.northside.jdk.repro;
 
 import javax.swing.*;
+import javax.swing.plaf.basic.BasicLookAndFeel;
 import java.awt.*;
 import java.lang.reflect.*;
 
@@ -28,7 +29,7 @@ import java.lang.reflect.*;
  * Custom Look And Feel that wraps system LookAndFeel.
  * Just return values of system laf's getDefaults for getDefaults method.
  */
-public class CustomThemeOfWrappingSystemLaf extends LookAndFeel {
+public class CustomThemeOfWrappingSystemLaf extends BasicLookAndFeel {
 
     private static final String NAME = CustomThemeOfWrappingSystemLaf.class.getSimpleName();
     private static final String CLASSNAME = CustomThemeOfWrappingSystemLaf.class.getName();
