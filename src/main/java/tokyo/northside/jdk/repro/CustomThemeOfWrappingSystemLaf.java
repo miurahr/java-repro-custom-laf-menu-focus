@@ -22,6 +22,7 @@ package tokyo.northside.jdk.repro;
 
 import javax.swing.*;
 import java.awt.*;
+import java.lang.reflect.*;
 
 /**
  * Custom Look And Feel that wraps system LookAndFeel.
@@ -36,6 +37,7 @@ public class CustomThemeOfWrappingSystemLaf extends LookAndFeel {
 
     /**
      * Utility to install and set LookAndFeel.
+     *
      * @throws Exception when got error.
      */
     public static void installAndSet() throws Exception {
@@ -46,13 +48,14 @@ public class CustomThemeOfWrappingSystemLaf extends LookAndFeel {
 
     /**
      * Constructor of custom laf.
+     *
      * @throws UnsupportedLookAndFeelException when failed to create laf.
      */
     public CustomThemeOfWrappingSystemLaf() throws UnsupportedLookAndFeelException {
         String systemLafClass = UIManager.getSystemLookAndFeelClassName();
         for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
             if (info.getClassName().equals(systemLafClass)) {
-                systemLookAndFeel = UIManager.createLookAndFeel(info.getName());
+                systemLookAndFeel = createLookAndFeel(info.getName());
                 return;
             }
         }
@@ -108,5 +111,38 @@ public class CustomThemeOfWrappingSystemLaf extends LookAndFeel {
     @Override
     public void uninitialize() {
         systemLookAndFeel.uninitialize();
+    }
+
+    /**
+     * Compat for UIManager#createLookAndFeel.
+     *
+     * @param name name of LookAndFeel.
+     * @return LookAndFeel object.
+     * @throws UnsupportedLookAndFeelException when not found.
+     */
+    private LookAndFeel createLookAndFeel(String name) throws UnsupportedLookAndFeelException {
+        try {
+            // invoke UIManager.createLookAndFeel(name) on Java9+
+            Method method = UIManager.class.getDeclaredMethod("createLookAndFeel", String.class);
+            return (LookAndFeel) method.invoke(null, name);
+        } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
+            if ("GTK look and feel".equals(name)) {
+                name = "GTK+";
+            }
+            try {
+                for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                    if (info.getName().equals(name)) {
+                        LookAndFeel laf = (LookAndFeel) Class.forName(info.getClassName()).getDeclaredConstructor()
+                                .newInstance();
+                        if (!laf.isSupportedLookAndFeel()) {
+                            break;
+                        }
+                        return laf;
+                    }
+                }
+            } catch (ReflectiveOperationException | IllegalArgumentException ignore) {
+            }
+            throw new UnsupportedLookAndFeelException(name);
+        }
     }
 }
