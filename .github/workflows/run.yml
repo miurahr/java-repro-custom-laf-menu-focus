@@ -5,6 +5,7 @@ on: push
 jobs:
   gradle-check:
     strategy:
+      fail-fast: false
       matrix:
         os: [linux-latest, windows-latest, macos-latest]
         java-version: ['11', '17']
