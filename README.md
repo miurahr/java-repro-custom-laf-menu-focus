@@ -1,14 +1,22 @@
 # Reproducer of an issue related with custom LaF and menu focus
 
-When running Swing application with custom LaF that utilize UIManager.getDefaults(),
-and wraps system LaF, test failed as wrong focus owner.
+The reproducer simple Java/Swing application, that give focus on a text field then call menu by
+Alt/Key combination, failed assertion as a "wrong focus owner", that the focus does not move to
+`JRootPane` from `JTextField`, when activate a custom LaF that utilizes `UIManager`'s `getDefaults`
+mechanism and just wraps system's default LaF.
 
-This is triggered by installing custom LaF that wrap system laf.
-CustomThemeOfWrappingSystemLaf class is the example. 
-After calling JMenu by Alt/Key combinations, the focus is still on TextField,
-not on JRootPane. The issue is observed on Linux, and Windows.
+`CustomThemeOfWrappingSystemLaf` class is the example of the custom LaF that wrap system laf.
 
-- related: OmegaT [BUGS#1073](https://sourceforge.net/p/omegat/bugs/1073/)
+## Conditions
 
+OS: Linux and Windows
+OpenJDK: 8, 11, 17 
 
+## Project affected
 
+- OmegaT [BUGS#1073](https://sourceforge.net/p/omegat/bugs/1073/)
+
+## License
+
+The codes and contents are licensed under GNU General Public License version 2,
+or (at your option) any later versions.
