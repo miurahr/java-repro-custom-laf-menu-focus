@@ -1,16 +1,19 @@
-# Reproducer of an issue related with custom LaF and menu focus
+# Reproducer of a custom LaF and menu focus issue
 
-The reproducer simple Java/Swing application, that give focus on a text field then call menu by
+This is a reproducer which give focus on a text field then call menu by
 Alt/Key combination, failed assertion as a "wrong focus owner", that the focus does not move to
 `JRootPane` from `JTextField`, when activate a custom LaF that utilizes `UIManager`'s `getDefaults`
 mechanism and just wraps system's default LaF.
 
-`CustomThemeOfWrappingSystemLaf` class is the example of the custom LaF that wrap system laf.
+`CustomThemeOfWrappingSystemLaf` class is the example of the minimum custom LaF that wrap system laf.
+
+When comment-out `CustomThemeOfWrappingSystemLaf.installAndSet()` from a main method,
+all the tests are passed as expected.
 
 ## Conditions
 
-OS: Linux and Windows
-OpenJDK: 8, 11, 17 
+- OS: Linux, macOS and Windows
+- OpenJDK: 8, 11, 17
 
 ## Project affected
 
